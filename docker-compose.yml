@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  ach_dqd:
+    build: ach_dqd
+    ports:
+      - "5641:5641"
+    environment:
+      ACHILLES_RUN: "1"
+      DQD_RUN: "1"
+      DQD_VIZ_RUN: "1"
+      # Add other environmental variables here to override entrypoint defaults
+    volumes:
+      - "./output:/output"
