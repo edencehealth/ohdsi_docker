@@ -9,6 +9,11 @@ message("Beginning Achilles Processes...")
 library(Achilles)
 library(httr)
 
+# Load docker secret file
+# CREATE VERSION THAT DOES NOT RELY ON SECRET
+# secret_pw <- read.table("<SOME SECRET>")
+# ret <- Sys.setenv(ACH_DQD_DB_PASSWORD = secret_pw[1,])
+
 valid_dbms <- list(
   "bigquery",
   "netezza",
@@ -41,8 +46,6 @@ env$ACH_DQD_DB_PORT <- as.numeric(env$ACH_DQD_DB_PORT)
 env$ACHILLES_NUM_THREADS <- as.numeric(env$ACHILLES_NUM_THREADS)
 
 as_bool <- function(x) as.logical(as.numeric(x))
-env$ACHILLES_ENABLE_HEEL <- as_bool(env$ACHILLES_ENABLE_HEEL)
-env$ACHILLES_ENABLE_HEEL_ONLY <- as_bool(env$ACHILLES_ENABLE_HEEL_ONLY)
 env$ACHILLES_ENABLE_JSON_COMPRESS <- as_bool(env$ACHILLES_ENABLE_JSON_COMPRESS)
 env$ACHILLES_ENABLE_JSON_EXPORT <- as_bool(env$ACHILLES_ENABLE_JSON_EXPORT)
 env$ACHILLES_ENABLE_OPTIMIZE_ATLAS_CACHE <- as_bool(env$ACHILLES_ENABLE_OPTIMIZE_ATLAS_CACHE)
@@ -50,10 +53,13 @@ env$ACHILLES_ENABLE_OPTIMIZE_ATLAS_CACHE <- as_bool(env$ACHILLES_ENABLE_OPTIMIZE
 # Create name to tag results and output path from ACH_DQD_SOURCE_NAME and time
 current_datetime <- strftime(Sys.time(), format = "%Y-%m-%dT%H.%M.%S")
 output_path <- paste(
+  "/output",
   env$ACHILLES_OUTPUT_BASE,
+  "/",
   env$ACH_DQD_SOURCE_NAME,
+  "/",
   current_datetime,
-  sep = "/"
+  sep = ""
 )
 dir.create(output_path, showWarnings = FALSE, recursive = TRUE, mode = "0755")
 
@@ -73,7 +79,7 @@ if (env$ACH_DQD_DB_DBMS %in% name_concat_dbms) {
 }
 
 # Create connection details using DatabaseConnector utility.
-connection_details <- createConnectionDetails(
+connectionDetails <- createConnectionDetails(
   dbms = env$ACH_DQD_DB_DBMS,
   user = env$ACH_DQD_DB_USERNAME,
   password = env$ACH_DQD_DB_PASSWORD,
@@ -82,20 +88,9 @@ connection_details <- createConnectionDetails(
   pathToDriver = env$DB_DRIVER_PATH
 )
 
-if (env$ACHILLES_ENABLE_HEEL_ONLY) {
-  achillesHeel(
-    connection_details,
-    cdmDatabaseSchema = env$ACH_DQD_CDM_SCHEMA,
-    resultsDatabaseSchema = env$ACH_DQD_RES_SCHEMA,
-    vocabDatabaseSchema = env$ACH_DQD_VOCAB_SCHEMA,
-    cdmVersion = env$ACH_DQD_CDM_VERSION,
-    numThreads = env$ACHILLES_NUM_THREADS
-  )
-  stop("exiting in ACHILLES_ENABLE_HEEL_ONLY mode")
-}
 
 achilles(
-  connection_details,
+  connectionDetails = connectionDetails,
   cdmDatabaseSchema = env$ACH_DQD_CDM_SCHEMA,
   resultsDatabaseSchema = env$ACH_DQD_RES_SCHEMA,
   vocabDatabaseSchema = env$ACH_DQD_VOCAB_SCHEMA,
@@ -103,14 +98,13 @@ achilles(
   cdmVersion = env$ACH_DQD_CDM_VERSION,
   createIndices = !(env$ACH_DQD_DB_DBMS %in% no_index_dbms),
   numThreads = env$ACHILLES_NUM_THREADS,
-  runHeel = env$ACHILLES_ENABLE_HEEL,
   optimizeAtlasCache = env$ACHILLES_ENABLE_OPTIMIZE_ATLAS_CACHE
 )
 
 if (env$ACHILLES_ENABLE_JSON_EXPORT) {
   # Export Achilles results to output path in JSON format.
   exportToJson(
-    connection_details,
+    connectionDetails = connectionDetails,
     cdmDatabaseSchema = env$ACH_DQD_CDM_SCHEMA,
     resultsDatabaseSchema = env$ACH_DQD_RES_SCHEMA,
     vocabDatabaseSchema = env$ACH_DQD_VOCAB_SCHEMA,

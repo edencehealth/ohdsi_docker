@@ -25,10 +25,13 @@ if (!(env$DQD_VIZ_DISPLAY_MODE %in% valid_display_mode)) {
 
 if (env$DQD_RUN == "1" && env$DQD_VIZ_JSON_PATH == "0") {
   json_dir <- paste(
+    "/output",
     env$DQD_OUTPUT_BASE,
+    "/",
     env$ACH_DQD_SOURCE_NAME,
+    "/",
     env$TIMESTAMP_RUN,
-    sep = "/"
+    sep = ""
   )
   json_path <- file.path(json_dir, env$DQD_JSON_FILE_NAME)
 } else if (env$DQD_RUN == "0" && env$DQD_VIZ_JSON_PATH != "0") {
@@ -45,13 +48,14 @@ if (env$DQD_VIZ_HOST == "localhost") {
   env$DQD_VIZ_HOST <- "0.0.0.0"
 }
 
-app_dir <- system.file(
+
+appDir <- system.file(
   "shinyApps",
   package = "DataQualityDashboard"
 )
 
 shiny::runApp(
-  appDir = app_dir,
+  appDir = appDir,
   host = env$DQD_VIZ_HOST,
   port = env$DQD_VIZ_PORT,
   display.mode = env$DQD_VIZ_DISPLAY_MODE,

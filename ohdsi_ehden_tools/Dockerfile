@@ -8,6 +8,9 @@ COPY cran_apt_pubkey.asc /tmp/
 # os-level dependencies
 RUN set -x \
   && for section in $(seq 1 8); do \
+    rm -rf "/usr/share/man/man${section}" \
+  ; done \
+  && for section in $(seq 1 8); do \
     mkdir "/usr/share/man/man${section}" \
   ; done \
   && AG="env DEBIAN_FRONTEND=noninteractive apt-get -yq" \
@@ -17,6 +20,8 @@ RUN set -x \
     apt-transport-https \
     ca-certificates \
     gnupg \
+    curl \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B8F25A8A73EACF41 \
   && DEBIAN_CRAN_REPO="${DEBIAN_CODENAME}-cran40" \
   && printf 'deb %s %s\n' \
     "https://cloud.r-project.org/bin/linux/debian" \
@@ -31,6 +36,8 @@ RUN set -x \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
+    libfontconfig1-dev \
+    libcairo2-dev \
     locales \
     openjdk-11-jdk-headless \
   && $AG install --no-install-recommends -t "${DEBIAN_CRAN_REPO}" \
@@ -81,6 +88,8 @@ RUN set -x \
     OHDSI/DatabaseConnectorJars \
     OHDSI/ParallelLogger \
     OHDSI/SqlRender \
+    OHDSI/ROhdsiWebApi \
+    EHDEN/CdmInspection \
   && rm -rf /tmp/downloaded_packages/ /tmp/*
 
 # Get achilles source code and install it
@@ -133,20 +142,47 @@ RUN set -e \
   ; R CMD INSTALL /build \
   ; rm -rf /tmp/downloaded_packages/ /tmp/* /build
 
-ARG ACH_DQD_UID=10001
-ARG ACH_DQD_GID=10001
+ARG INS_REP_VERSION=trunk
+RUN mkdir /build \
+  ; cd /build \
+    set -e \
+    && set -x \
+    && curl -LO https://github.com/EHDEN/CdmInspection/archive/refs/tags/v1.0.4.tar.gz \
+    && tar -xzf v1.0.4.tar.gz \
+  ; R CMD INSTALL CdmInspection-1.0.4 \
+  ; rm -rf /tmp/downloaded_packages/ /tmp/* /build
+
+ARG CAT_ENTRY_VERSION=trunk
+RUN mkdir /build \
+  ; cd /build \
+    set -e \
+    && set -x \
+    && curl -LO https://github.com/EHDEN/CatalogueExport/archive/refs/tags/v1.02.tar.gz \
+    && tar -xzf v1.02.tar.gz \
+  ; R CMD INSTALL CatalogueExport-1.02 \
+  ; rm -rf /tmp/downloaded_packages/ /tmp/* /build
+
+#ARG ACH_DQD_UID=10001
+#ARG ACH_DQD_GID=10001
 
 # Create a non-root user with full access to the /app directory
-RUN set -x \
-  && groupadd -g ${ACH_DQD_GID} achdqd \
-  && useradd -u ${ACH_DQD_UID} -g achdqd achdqd \
-  && mkdir /output \
-  && chown -R achdqd:achdqd /output/
+#RUN set -x \
+ # && groupadd -g ${ACH_DQD_GID} achdqd \
+ # && useradd -u ${ACH_DQD_UID} -g achdqd achdqd \
+ # && mkdir /output \
+ # && chown -R achdqd:achdqd /output/
+
+## ALLOW FOR OFFLINE EXECUTION OF DASHBOARD
+RUN mkdir /usr/local/lib/R/site-library/DataQualityDashboard/shinyApps/www/offline
+COPY ["network_file_1.js", "network_file_2.js", "network_file_3.js", "network_file_4.js", "style_sheet_1.css", "style_sheet_2.css", "style_sheet_3.css", "style_sheet_4.css", "/usr/local/lib/R/site-library/DataQualityDashboard/shinyApps/www/offline/"]
+COPY ["index.html", "/usr/local/lib/R/site-library/DataQualityDashboard/shinyApps/www/"]
 
 WORKDIR /output
 
-COPY ["achilles.r", "dqd.r", "dqd_viz.r", "ach_and_dqd.r", "entrypoint.sh", "/app/"]
+COPY ["achilles.r", "dqd.r", "dqd_viz.r", "ach_and_dqd.r", "inspection_report.r", "catalogue_entry.r", "entrypoint.sh", "/app/"]
 
-USER ${ACH_DQD_UID}
+RUN ["chmod", "+x", "-R", "/app/"]
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+#USER ${ACH_DQD_UID}
+
+ENTRYPOINT ["bash","/app/entrypoint.sh"]

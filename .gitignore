@@ -1,3 +1,4 @@
 .DS_Store
 output
-docker-compose.override.yml
+.idea/
+
