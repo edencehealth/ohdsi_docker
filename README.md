@@ -1,4 +1,4 @@
-# OHDSI EHDEN QCAT
+# OHDSI EHDEN TOOLS
 
 ## Get Started
 
