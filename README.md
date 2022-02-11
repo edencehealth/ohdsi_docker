@@ -4,10 +4,10 @@
 
 ### TO BUILD
 
-- Execute `docker-compose build ohdsi_ehden_tools` in the build directory. Changing the string after `image:` in the `docker-compose.yml` file in that directory will allow you to update its name/tag
+- Execute `docker-compose build ohdsi_ehden_tools` in the build directory. Adding the argument `image:` in the `docker-compose.yml` file below `build:` will allow you to update the name/tag of the image
 
 - Note that the files `network_file_*` and `style_sheet_*` are pre-pulled from their network locations and copied (see Dockerfile near-end) to a new `offline` directory in the DataQualityDashboard shiny app source code. The `index.html` file is modified to reference these new offline files and properly render the json viewer in network isolation.
-- All packages and dependencies are installed for Achilles, DQD, and CdmInspection. **NOTE** that Achilles Heel has been removed from the Achilles repository as of Dec 2021, so this version of Achilles does not run Heel (env variables related to Heel are also now removed). This is not a problem for atlas because DQD fills the the tables that Heel would originally populate.
+- All packages and dependencies are installed for Achilles, DQD, and CdmInspection. **NOTE** that Achilles Heel has been removed from the Achilles repository as of Dec 2021, so this version of Achilles does not run Heel (env variables related to Heel are also now removed). This is not a problem for atlas because DQD fills the tables that Heel would originally populate.
 - A word of caution: the build process from scratch takes 30+ minutes depending on your machine, so modify the Dockerfile with care.
 
 ### TO RUN
