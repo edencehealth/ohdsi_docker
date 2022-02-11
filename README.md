@@ -13,7 +13,7 @@
 ### TO RUN
 
 - There are quite a few environment variables that can be modified for the various services (see docker-compose.override.yml); most can be left as their defaults. 
-- The critical variables for executing the various OHDSI Tools contain the suffix: `_RUN`, and there are 4 of them:
+- The critical variables for executing the various OHDSI Tools contain the suffix: `_RUN`, and there are 5 of them:
 
 	- `ACHILLES_RUN`
 	- `DQD_RUN`
