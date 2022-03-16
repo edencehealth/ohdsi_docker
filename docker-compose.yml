@@ -10,10 +10,10 @@ services:
       # Add other environmental variables here to override entrypoint defaults
     networks:
       - demo-net
-# NOTE THAT THIS IMAGE DOES NOT USE DOCKER SECRETS FOR DEPLOYMENT FLEXIBILITY
+
+# NOTE: this image does not use "docker secrets" for deployment flexibility
+
 networks:
   demo-net:
     external:
       name: demo-net
-
-
