@@ -22,5 +22,4 @@ jobs:
             --volume "$(pwd):/work" \
             backplane/yamllint \
               -f github \
-              containers \
-              .github
+              .
