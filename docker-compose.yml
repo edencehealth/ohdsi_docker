@@ -1,8 +1,8 @@
 version: '3.5'
 services:
-  ohdsi_ehden_tools:
+  ehden_tools:
     build:
-      context: ohdsi_ehden_tools
+      context: ehden_tools
     ports:
       - "5641:5641"
     environment:
