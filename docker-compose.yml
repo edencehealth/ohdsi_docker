@@ -1,14 +1,19 @@
 version: '3.5'
-
 services:
-  ach_dqd:
-    build: ach_dqd
+  ehden_tools:
+    build:
+      context: ehden_tools
     ports:
       - "5641:5641"
     environment:
       ACHILLES_RUN: "1"
-      DQD_RUN: "1"
-      DQD_VIZ_RUN: "1"
       # Add other environmental variables here to override entrypoint defaults
-    volumes:
-      - "./output:/output"
+    networks:
+      - demo-net
+
+# NOTE: this image does not use "docker secrets" for deployment flexibility
+
+networks:
+  demo-net:
+    external:
+      name: demo-net

@@ -1,0 +1,58 @@
+version: '3.5'
+services:
+  ehden_tools:
+    ports:
+      - "5641:5641"
+    volumes:
+      - "<LOCAL DIRECTORY FOR OUTPUT>:/output"
+    environment:
+      ACH_DQD_CDM_VERSION: "5.3"
+      ACH_DQD_CDM_SCHEMA: "omopcdm"
+      ACH_DQD_DB_DBMS: "postgresql"
+      ACH_DQD_DB_HOSTNAME: "<HOST NAME>"  # NOTE: this should be the name (from docker ps) of the service running your CDM database if dockerized
+      ACH_DQD_DB_NAME: "postgres"
+      ACH_DQD_DB_PASSWORD: "<HARD CODE PASSWORD>"  # CHANGEME
+      ACH_DQD_DB_PORT: "5432"
+      ACH_DQD_DB_USERNAME: "postgres"
+      ACH_DQD_RES_SCHEMA: "results"
+      ACH_DQD_SOURCE_NAME: "<DEFAULT DATA SOURCE>"  # CHANGEME
+      ACH_DQD_VOCAB_SCHEMA: "omopcdm"
+      ACHILLES_ENABLE_JSON_COMPRESS: "1"
+      ACHILLES_ENABLE_JSON_EXPORT: "0"
+      ACHILLES_ENABLE_OPTIMIZE_ATLAS_CACHE: "0"
+      ACHILLES_NUM_THREADS: "1"
+      ACHILLES_OUTPUT_BASE: "/achilles_output"
+      ACHILLES_RUN: "1"
+      DQD_CHECK_LEVELS: "table_field_concept"
+      DQD_CHECK_NAMES: "0"
+      DQD_ENABLE_JSON_TO_TABLE: "0"
+      DQD_JSON_FILE_NAME: "DQD_Results.json"
+      DQD_NUM_THREADS: "1"
+      DQD_OUTPUT_BASE: "/dqd_output"
+      DQD_RUN: "1"
+      DQD_SQL_ONLY: "0"
+      DQD_TABLES_TO_EXCLUDE: "0"
+      DQD_VERBOSE_MODE: "0"
+      DQD_VIZ_DISPLAY_MODE: "normal"
+      DQD_VIZ_HOST: "localhost"
+      DQD_VIZ_JSON_PATH: "0"
+      DQD_VIZ_LAUNCH_BROWSER: "0"
+      DQD_VIZ_PORT: "5641"
+      DQD_VIZ_RUN: "1"
+      DQD_WRITE_TO_TABLE: "0"
+      INS_REP_CUTOFF: "5"
+      INS_REP_VERBOSE: "1"
+      INS_REP_OUTPUT_BASE: "/inspection_report"
+      INS_REP_DB_ID: "<DEFAULT ID>"  # CHANGEME
+      INS_REP_DB_NAME: "<DEFAULT DATA SOURCE NAME>"  # CHANGEME
+      INS_REP_DB_DESCRIPTION: "<DEFAULT DESCRIPTION>"  # CHANGEME
+      INS_REP_BASE_URL: "http://localhost:8000"
+      INS_REP_AUTHOR: "edenceHealth"
+      INS_REP_RUN: "0"
+      CAT_ENT_OUTPUT_BASE: "/catalogue_entry"
+      CAT_ENT_DB_ID: "<DEFAULT ID>"  # CHANGEME
+      CAT_ENT_SRC_NAME: "<DEFAULT DATA SOURCE NAME>"  # CHANGEME
+      CAT_ENT_CDM_VER: "5.3.0"
+      CAT_ENT_RUN: "0"
+      TIMESTAMP_RUN: "0"
+      # Add other environment variables here to override entrypoint defaults
